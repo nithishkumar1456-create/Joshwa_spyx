@@ -53,29 +53,18 @@ export default function ContactSection() {
     setErrorMsg("");
     setIsSubmitting(true);
 
-    try {
-      const response = await fetch("/api/contact", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+    // Create mailto link as fallback since backend is removed
+    const subject = encodeURIComponent(`New Project Request from ${formData.name}`);
+    const body = encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\n\nProject Details:\n${formData.projectDetails}`);
+    const mailtoUrl = `mailto:${PORTFOLIO_USER.email}?subject=${subject}&body=${body}`;
 
-      if (response.ok) {
-        setIsSubmitting(false);
-        setIsSubmitted(true);
-        setFormData({ name: "", email: "", projectDetails: "" });
-      } else {
-        const data = await response.json();
-        setErrorMsg(data.message || "Failed to send message. Please try again.");
-        setIsSubmitting(false);
-      }
-    } catch (error) {
-      console.error("Error submitting form:", error);
-      setErrorMsg("An error occurred. Please try again later.");
+    // Small delay to simulate "processing" and then open mail client
+    setTimeout(() => {
+      window.location.href = mailtoUrl;
       setIsSubmitting(false);
-    }
+      setIsSubmitted(true);
+      setFormData({ name: "", email: "", projectDetails: "" });
+    }, 1000);
   };
 
   return (
